@@ -1,5 +1,6 @@
 #import dependencies
 import pandas as pd
+import numpy as np
 
 #read data
 df = pd.read_csv("Data/dummy.csv", header = None, names = ["Name", "Email", "Restricted Members"])
@@ -36,9 +37,9 @@ class Graph:
         self.vertices = n
 
     #cheks if the vertex being considered is a legal vertex
-    def isValid(self, vertex, position, path):
+    def isValid(self, vertex, index, path):
         #make sure there is an edge between last vertex and considered vertex
-        if self.adj_matrix[path[position]] [vertex] == 0:
+        if self.adj_matrix[path[index - 1] - 1] [vertex - 1] == 0:
             return False
         #make sure the vertex being considered isn't alredy in the path
         for v in path:
@@ -52,14 +53,15 @@ class Graph:
         #traversed all of the verticies
         if pos == self.vertices:
             #Does the last vertex connect to vertex 1?
-            if self.adj_matrix[ path[pos-1] ] [ path[0]] == 1:
+            if self.adj_matrix[path[pos - 1] - 1][path[0] - 1] == 1:
                 return True
+                
             else:
                 return False
 
         #our starting point is vertex 1 so we start at vertex 2 and we want
         # to try every vertex (eventually) for a solution 
-        for v in range(2 , self.vertices):
+        for v in range(1 , self.vertices + 1):
             #if the vertex is valid then we add it to the path
             if self.isValid(v, pos, path) == True:
                 path[pos] = v
@@ -73,7 +75,7 @@ class Graph:
 
     def solver(self):
         #initialize the path list 
-        path = path = [0] * self.vertices
+        path = [0] * self.vertices
         #start with vertex 1
         path[0] = 1
 
@@ -81,7 +83,23 @@ class Graph:
         if self.findHam(path, 1) == False:
             print("There is no Hamiltonian Cycle")
             return False
-        
-        for vertex in path:
-            print(vertex, end = " ")
+
+        print(path)
         return True
+
+g1 = Graph(4)
+g1.solver()
+
+g1.adj_matrix= np.array(
+            [[0, 1, 1, 1],
+            [1, 0, 1, 1],
+            [1, 1, 0, 1],
+            [1, 1, 1, 0]])
+g1.solver()
+
+g1.adj_matrix= np.array(
+            [[0, 1, 1, 0],
+            [1, 0, 1, 1],
+            [1, 1, 0, 1],
+            [0, 1, 1, 0]])
+g1.solver()
