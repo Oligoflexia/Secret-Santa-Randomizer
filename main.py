@@ -28,6 +28,60 @@ class Person:
 
 class Graph:
     def __init__(self, n):
+        #adjacency matrix representation of a graph
+        #inititialized with all 1 representing a fully connected graph
         self.adj_matrix = [[1 for c in range(n)] for r in range(n)]
+        
+        #Number of participants
+        self.vertices = n
 
-#def findCycle()
+    #cheks if the vertex being considered is a legal vertex
+    def isValid(self, vertex, position, path):
+        #make sure there is an edge between last vertex and considered vertex
+        if self.adj_matrix[path[position]] [vertex] == 0:
+            return False
+        #make sure the vertex being considered isn't alredy in the path
+        for v in path:
+            if v == vertex: 
+                return False
+        #else return True
+        return True
+    
+    #Recursive algorithm to find Hamiltonian Path
+    def findHam(self, path, pos):
+        #traversed all of the verticies
+        if pos == self.vertices:
+            #Does the last vertex connect to vertex 1?
+            if self.adj_matrix[ path[pos-1] ] [ path[0]] == 1:
+                return True
+            else:
+                return False
+
+        #our starting point is vertex 1 so we start at vertex 2 and we want
+        # to try every vertex (eventually) for a solution 
+        for v in range(2 , self.vertices):
+            #if the vertex is valid then we add it to the path
+            if self.isValid(v, pos, path) == True:
+                path[pos] = v
+                #we continue to recurse 
+                if self.findHam(path, pos + 1) == True:
+                    return True
+                #if the current vertex doesn't have any possible paths
+                path[pos] = 0
+
+        return False
+
+    def solver(self):
+        #initialize the path list 
+        path = path = [0] * self.vertices
+        #start with vertex 1
+        path[0] = 1
+
+        #no solution exists
+        if self.findHam(path, 1) == False:
+            print("There is no Hamiltonian Cycle")
+            return False
+        
+        for vertex in path:
+            print(vertex, end = " ")
+        return True
