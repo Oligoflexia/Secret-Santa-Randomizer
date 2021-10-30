@@ -1,31 +1,31 @@
 #import dependencies
 import pandas as pd
 import numpy as np
+import zlib
+import base64
+import random
 
 #read data
-df = pd.read_csv("Data/dummy.csv", header = None, names = ["Name", "Email", "Restricted Members"])
+data_df = pd.read_csv("Data/dummy.csv", header = None, names = ["Name", "Email", "Restricted Members"])
+data_list = np.array(data_df.values.tolist())
 
-class Edge:
-    def __init__(self, sender, recipient):
-        self.sender = sender
-        self.recipient = recipient
+# initialize global hashmap to store data
+master = {}
+obfuscated = []
 
 class Person:
     def __init__(self, name, email, edges):
         self.name = name
         self.email = email
         self.edges = edges
-        self.hash = 0
-    
-    #Takes a person's name and converts it into a number
-    def obfuscate(name):
-        pass
 
-    #Takes a number and tries to insert it into a hash table using a rolling hash
-    def rollingHash(number):
-        pass
+    #Takes a person's name and encodes it
+    def obfuscate(self):
+        return base64.urlsafe_b64encode(zlib.compress(bytes(self.name, 'utf-8'),9))
 
-    #Takes a hash and tries to return the number 
+    #Takes an encoded name and decodes it
+    def unobfuscate(obscured):
+        return zlib.decompress(base64.urlsafe_b64decode(obscured))
 
 class Graph:
     def __init__(self, n):
@@ -87,19 +87,99 @@ class Graph:
         print(path)
         return True
 
-g1 = Graph(4)
-g1.solver()
+#create people objects
+for person in data_list:
+    person_obj = Person(person[0], person[1], person[2])
 
-g1.adj_matrix= np.array(
-            [[0, 1, 1, 1],
-            [1, 0, 1, 1],
-            [1, 1, 0, 1],
-            [1, 1, 1, 0]])
-g1.solver()
+    #Takes a person object and uses the data to create an entry in the master hashmap
+    master[person_obj.obfuscate()] = person_obj.email
+    obfuscated.append(person_obj.obfuscate())
 
-g1.adj_matrix= np.array(
-            [[0, 1, 1, 0],
-            [1, 0, 1, 1],
-            [1, 1, 0, 1],
-            [0, 1, 1, 0]])
-g1.solver()
+print(obfuscated)
+
+random.shuffle(obfuscated)
+
+print(obfuscated)
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Tests for Graph Class
+#g1 = Graph(4)
+#g1.solver()
+
+#g1.adj_matrix= np.array(
+#            [[0, 1, 1, 1],
+#            [1, 0, 1, 1],
+#            [1, 1, 0, 1],
+#            [1, 1, 1, 0]])
+#g1.solver()
+#
+#g1.adj_matrix= np.array(
+#            [[0, 1, 1, 0],
+#            [1, 0, 1, 1],
+#            [1, 1, 0, 1],
+#            [0, 1, 1, 0]])
+#g1.solver()
+#
+#g2 = Graph(6)
+#g2.adj_matrix= np.array(
+#            [[0, 1, 0, 1, 0, 0],
+#            [1, 0, 1, 0, 0, 1],
+#            [0, 1, 0, 1, 1, 1],
+#            [1, 0, 1, 0, 1, 0],
+#            [0, 0, 1, 1, 0, 1],
+#            [0, 1, 1, 0, 1, 0]])
+#g2.solver()
