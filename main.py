@@ -1,18 +1,41 @@
+# Secret Santa Randomizer
+#
+# Souvik Maiti
+# smaiti@alumni.ubc.ca
+# TODO Publish Date
+# TODO Version Number
+#
+#   I always felt that it was sad that if a group of people wished to organize a Secret Santa online
+# one person has to be the 'sacrificial lamb' and know all the pairings, ruining their enjoyment. 
+# Python scripts don't have feelings (yet, probably) so they make the perfect lamb. 
+# Oh Python... who gave thee such a tender voice?
+
 #import dependencies
 import pandas as pd
 import numpy as np
 import zlib
 import base64
 import random
+import os
+import smtplib
+from email.message import EmailMessage
 
-#read data
+#read data 
 data_df = pd.read_csv("Data/dummy.csv", header = None, names = ["Name", "Email", "Restricted Members"])
 data_list = np.array(data_df.values.tolist())
 
-# initialize global hashmap to store data
-master = {}
-obfuscated = []
+# initialize global variables
+MASTER = {}
+OBFUSCATED = []
 
+#TODO Figure out why environment variables aren't working
+#Replace with actual password if not in your environment
+EMAIL_ADDRESS = os.environ['EMAIL']
+EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
+
+#TODO: 
+#- implement text -> matrix function
+#- implement a function to make invalid edges = 0 in the matrix. 
 class Person:
     def __init__(self, name, email, edges):
         self.name = name
@@ -91,21 +114,33 @@ class Graph:
 for person in data_list:
     person_obj = Person(person[0], person[1], person[2])
 
-    #Takes a person object and uses the data to create an entry in the master hashmap
-    master[person_obj.obfuscate()] = person_obj.email
-    obfuscated.append(person_obj.obfuscate())
+    #Takes a person object and uses the data to create an entry in the MASTER hashmap
+    MASTER[person_obj.obfuscate()] = person_obj.email
+    OBFUSCATED.append(person_obj.obfuscate())
 
-print(obfuscated)
+random.shuffle(OBFUSCATED)
 
-random.shuffle(obfuscated)
-
-print(obfuscated)
+print(OBFUSCATED)
         
 
+msg = EmailMessage()
+msg['Subject'] = "2021 Secret Santa!"
+msg['From'] = EMAIL_ADDRESS
+msg['To'] = "maiti_s@ymail.com"
+msg.set_content("Hello name, the person you have been assigned to gift is: name" +
+    "This automated message has been sent to you by a friendly script due to your participation in a Secret Santa. If you believe this is a mistake please contact the sender")
 
+#smtp.gmail.com, 587 (SMTP)
+#smtp.gmail.com, 465 (SMTP_SSL)
 
+# TODO set up mail for each function
+with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
+    smtp.send_message(msg)
 
+print(EMAIL_PASSWORD)
+print(EMAIL_ADDRESS)
 
 
 
